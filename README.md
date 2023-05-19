@@ -50,14 +50,11 @@ To meet our stated goals, we propose partitioning :visited links history. For th
 
 Our partition key will be “triple-keyed” or store three pieces of information: the link’s URL, the top-level site, and the origin of the frame where the link is rendered.
 
-<center><figure>
-    <img src="./img/ExplainerImage1.jpg" width="600px" alt="Our example is a site `https://www.foo.com`, which contains an iframe that displays `https://www.bar.com`. The iframe contains an anchor element to `https://link.example` that is styled as visited. The resulting partition key contains a Link URL value of `https://link.example`, a Top-Level Site value of `https://foo.com`, and a Frame Origin value of `https://www.bar.com`.">
-    <br>
-(1) The renderer determines the partition key for each link on the page.
-(2) The renderer asks if the partition keys are stored in :visited Links.
-(3) If :visited Links contains an entry matching all parts of the partition key, it allows the renderer to color the link as visited.
-    <br><br>
-</figure></center>
+![Our example is a site `https://www.foo.com`, which contains an iframe that displays `https://www.bar.com`. The iframe contains an anchor element to `https://link.example` that is styled as visited. The resulting partition key contains a Link URL value of `https://link.example`, a Top-Level Site value of `https://foo.com`, and a Frame Origin value of `https://www.bar.com`.](./img/ExplainerImage1.jpg)
+
+1. The renderer determines the partition key for each link on the page.
+2. The renderer asks if the partition keys are stored in :visited Links.
+3. If :visited Links contains an entry matching all parts of the partition key, it allows the renderer to color the link as visited.
 
 ## Prior Art:
 There have been many proposals to reduce the amount of user browsing history leaked by :visited links. Proposals written before 2011 are well summarized by Weinberg et. al. in Section IV: “F. Discussion” of [I Still Know What You Visited Last Summer: Leaking Browsing History via User Interaction and Side Channel Attacks.](https://ieeexplore.ieee.org/document/5958027)
