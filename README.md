@@ -77,34 +77,24 @@ Ultimately, this potential solution did not align with our goal to “improve us
 
 ### Scenario #1: Partitioning Protects Against User-Interaction, Timing, and Pixel Color Attacks
 
-<center><figure>
-    <img src="./img/ExplainerImage2.jpg" width="600px" alt="Infographic depicting the process described below: a user going to a search engine, clicking on a link, and then contrasting where links would be styled as visited before and after partitioning.">
-    <br>
-<em>A user searches for private.com and clicks on the https://private.com link from the https://search.com/private results page. Before partitioning, this meant that any site, for example https://attacker.com, that embedded https://private.com as a link element could see if a user had visited it from the search results before. After partitioning, the links on https://attacker.com and https://search.com/private have different partition keys, as they have different frame origins and top-level sites. So the partitioned link is not colored - no longer leaking history to https://attacker.com.</em>
-    <br><br>
-</figure></center>
+!["Infographic depicting the process described below: a user going to a search engine, clicking on a link, and then contrasting where links would be styled as visited before and after partitioning."](./img/ExplainerImage2.jpg) <br/>
+<em>A user searches for private.com and clicks on the `https://private.com` link from the `https://search.com/private` results page. Before partitioning, this meant that any site, for example `https://attacker.com`, that embedded `https://private.com` as a link element could see if a user had visited it from the search results before. After partitioning, the links on `https://attacker.com` and `https://search.com/private` have different partition keys, as they have different frame origins and top-level sites. So the partitioned link is not colored - no longer leaking history to `https://attacker.com`.</em>
 
-Attackers employ user-interaction, timing, and pixel color side-channel exploits to gain the user’s browsing history. Currently, a styled :visited link reveals that a user has visited that site anywhere on the web (from a click on a third-party site, from a bookmark, from typing it into the omnibox). This is information that https://attacker.com does not already have. However, sites that embed link elements can already determine when a user clicks on a link, and what is embedded in that link. So by partitioning :visited links and limiting coloring to links clicked from this site and frame before, we are not leaking any history that an https://attacker.com does not already know.
+Attackers employ user-interaction, timing, and pixel color side-channel exploits to gain the user’s browsing history. Currently, a styled :visited link reveals that a user has visited that site anywhere on the web (from a click on a third-party site, from a bookmark, from typing it into the omnibox). This is information that `https://attacker.com` does not already have. However, sites that embed link elements can already determine when a user clicks on a link, and what is embedded in that link. So by partitioning :visited links and limiting coloring to links clicked from this site and frame before, we are not leaking any history that an `https://attacker.com` does not already know.
 
 As a result, partitioning :visited links eliminates its value to attackers, while maintaining the navigational benefits for users. 
 
 ### Scenario #2: Triple-Key Partitioning Protects Against Cross-Site Tracking
-<center><figure>
-    <img src="./img/ExplainerImage3.jpg" width="600px" alt="Our example consists of two sites. The first site, https://www.lorem.com, contains an iframe that displays https://www.foo.com. The iframe contains an anchor element (named “Lorem-Iframe Link”) to https://link.example that is styled as visited. The resulting partition key contains a Link URL value of https://link.example, a Top-Level Site value of https://lorem.com, and a Frame Origin value of https://www.foo.com. This is compared to the second site, https://www.ipsum.com, which contains an iframe that also displays https://www.foo.com. The iframe also contains an anchor element to https://link.example (named “Ipsum-Frame Link”), but this link is not styled as visited. The second site’s partition key contains a Link URL value of https://link.example, a Top-Level Site value of https://ipsum.com, and a Frame Origin value of https://www.foo.com.">
-    <br>
-<em>A user clicks “Lorem-Iframe Link.” Even though both frames display the same origin and have a link to https://link.example, only the “Lorem-Iframe Link” is styled as visited, as they have different top-level sites.</em>
-</figure></center>
+!["Our example consists of two sites. The first site, https://www.lorem.com, contains an iframe that displays https://www.foo.com. The iframe contains an anchor element (named “Lorem-Iframe Link”) to https://link.example that is styled as visited. The resulting partition key contains a Link URL value of https://link.example, a Top-Level Site value of https://lorem.com, and a Frame Origin value of https://www.foo.com. This is compared to the second site, https://www.ipsum.com, which contains an iframe that also displays https://www.foo.com. The iframe also contains an anchor element to https://link.example (named “Ipsum-Frame Link”), but this link is not styled as visited. The second site’s partition key contains a Link URL value of https://link.example, a Top-Level Site value of https://ipsum.com, and a Frame Origin value of https://www.foo.com.](./img/ExplainerImage3.jpg) <br>
+<em>A user clicks “Lorem-Iframe Link.” Even though both frames display the same origin and have a link to `https://link.example`, only the “Lorem-Iframe Link” is styled as visited, as they have different top-level sites.</em>
 
-The top-level site in a triple-key partition keeps history confined to the top-level site it was clicked on and prevents cross-site tracking. Otherwise documents from https://www.foo.com embedded by different top-level sites will have access to the same :visited link history, effectively creating an equivalent to the third-party cookie.
+The top-level site in a triple-key partition keeps history confined to the top-level site it was clicked on and prevents cross-site tracking. Otherwise documents from `https://www.foo.com` embedded by different top-level sites will have access to the same :visited link history, effectively creating an equivalent to the third-party cookie.
 
 ### Scenario #3: Triple-Key Partitioning Protects Against Mainframe History Leaks
-<center><figure>
-    <img src="./img/ExplainerImage4.jpg" width="600px" alt="Our example consists of a site, https://www.foo.com, that contains both an anchor element (named “Mainframe Link”) that points to https://link.example and an iframe that displays https://www.bar.com. The iframe also contains an anchor element (named “Subframe Link”) to https://link.example. “Mainframe Link” is styled as visited but “Subframe Link” is not. The mainframe partition key contains a Link URL value of https://link.example, a Top-Level Site value of https://foo.com, and a Frame Origin value of https://www.foo.com. The subframe partition key contains a Link URL value of https://link.example, a Top-Level Site value of https://foo.com, and a Frame Origin value of https://www.bar.com.">
-    <br>
-<em>A user clicks “Mainframe Link.” Even though both frames have a link to 
-https://link.example, only the mainframe link is colored as visited, as they have different 
+!["Our example consists of a site, https://www.foo.com, that contains both an anchor element (named “Mainframe Link”) that points to https://link.example and an iframe that displays https://www.bar.com. The iframe also contains an anchor element (named “Subframe Link”) to https://link.example. “Mainframe Link” is styled as visited but “Subframe Link” is not. The mainframe partition key contains a Link URL value of https://link.example, a Top-Level Site value of https://foo.com, and a Frame Origin value of https://www.foo.com. The subframe partition key contains a Link URL value of https://link.example, a Top-Level Site value of https://foo.com, and a Frame Origin value of https://www.bar.com."](./img/ExplainerImage4.jpg)<br>
+<em>A user clicks “Mainframe Link.” Even though both frames have a link to `https://link.example`, only the mainframe link is colored as visited, as they have different 
 frame origins.</em>
-</figure></center>
+
 The frame origin in a triple-key partition keeps history confined to the frame it is visited in. Otherwise, any content embedded in a site can determine the history of its embedder; this leak of information would be inconsistent with the same-origin policy which ensures that cross-site iframes don't get access to the state of their embedder, and vice versa.
 
 ## Additional Design Principles
@@ -118,12 +108,12 @@ To ensure that the transition between unpartitioned and partitioned :visited lin
 The goal of this proposed solution is to improve user privacy by reducing the amount of history leaked by :visited links and rendering the information gained by side-channel attacks obsolete. 
 
 Our partition key design enforces a strong privacy boundary:
-`Link URL`: the resource itself we are styling.
-`Top-Level Site`: the site of the top/main frame.
-prevents cross-site tracking.
-`Frame Origin`: the origin of the frame where the anchor element is displayed.
-prevents embedders from leaking history into embedded content and vice versa.
-prevents history leaks across subdomains with different security postures.
+- `Link URL`: the resource itself we are styling.
+- `Top-Level Site`: the site of the top/main frame.
+  - prevents cross-site tracking.
+- `Frame Origin`: the origin of the frame where the anchor element is displayed.
+  - prevents embedders from leaking history into embedded content and vice versa.
+  - prevents history leaks across subdomains with different security postures.
 
 ## Future Work
 #### Preventing Leaks From Renderer Compromises
@@ -136,7 +126,7 @@ The proposed API in this explainer would improve user privacy against side-chann
 #### Deprecate the :visited selector 
 The most obvious method of eliminating :visited history leaks is to get rid of :visited link styling entirely. As long as sites can style :link and :visited differently, there is some information about user browsing history available to side-channel attackers. 
 
-However, we chose not to deprecate the :visited selector because we believe it provides users with useful visual cues as they navigate around the web. Our goal is to improve users’ privacy while also preserving the navigational benefits that :visited links styling provides in information-rich or link-dense environments [\[6\]](TODO LINK REFERENCE 6). 
+However, we chose not to deprecate the :visited selector because we believe it provides users with useful visual cues as they navigate around the web. Our goal is to improve users’ privacy while also preserving the navigational benefits that :visited links styling provides in information-rich or link-dense environments [6]. 
 
 In our proposed solution, we take advantage of the fact that sites can easily record which of its own anchor elements a user has visited. Our partitioning method only styles links that have been visited from this site and frame before. Therefore, our partitioning method only provides information that the site already knows. This renders any side-channel attacks obsolete, and allows us to maintain :visited links styling without revealing any additional browsing history to attackers.
 
@@ -156,34 +146,27 @@ Thanks to Artur Janc, Mike Taylor, and Brianna Goldstein for their advice, exper
 #### Citations
 [1] A list of side-channel attacks employed to leak a user’s browsing history, grouped by type:
   #### User Interaction Attacks
-  - <em>Weinberg et al, S&P 2011: [I still know what you visited last summer](https://ieeexplore.ieee.org/abstract/document/5958027)
+  - Weinberg et al, S&P 2011: [I still know what you visited last summer](https://ieeexplore.ieee.org/abstract/document/5958027)
   - Michal Zalewski, 2013: ["Asteroids" game](https://lcamtuf.coredump.cx/yahh/)
   - Michal Zalewski, 2016: [mix-blend-mode whack-a-mole](https://lcamtuf.blogspot.com/2016/08/css-mix-blend-mode-is-bad-for-keeping.html)
-  - Ron Masas, 2021: [The human side channel](https://ronmasas.com/posts/the-human-side-channel)</em>
+  - Ron Masas, 2021: [The human side channel](https://ronmasas.com/posts/the-human-side-channel)
 
   #### Timing Attacks
-  - <em>Paul Stone, BlackHat 2013: [Pixel Perfect Timing Attacks with HTML5](https://owasp.org/www-pdf-archive//HackPra_Allstars-Browser_Timing_Attacks_-_Paul_Stone.pdf)
+  - Paul Stone, BlackHat 2013: [Pixel Perfect Timing Attacks with HTML5](https://owasp.org/www-pdf-archive//HackPra_Allstars-Browser_Timing_Attacks_-_Paul_Stone.pdf)
   - NDevTK: [Detecting Visited Links via Redraw Timing](https://ndev.tk/visted/)
   - Michael Smith et al, [USENIX WOOT 2018: Browser history re:visited](https://www.usenix.org/sites/default/files/conference/protected-files/woot18_slides_smith.pdf)
-  - Known WONTFIX bugs: [crbug.com/252165](http://crbug.com/252165), [crbug.com/835590](http://crbug.com/835590) </em>
+  - Known WONTFIX bugs: [crbug.com/252165](http://crbug.com/252165), [crbug.com/835590](http://crbug.com/835590)
 
   #### Pixel Color Attacks
-  - <em>Łukasz Olejnik, 2017: [Stealing sensitive browser data with the W3C Ambient Light Sensor API](https://blog.lukaszolejnik.com/stealing-sensitive-browser-data-with-the-w3c-ambient-light-sensor-api/)
+  - Łukasz Olejnik, 2017: [Stealing sensitive browser data with the W3C Ambient Light Sensor API](https://blog.lukaszolejnik.com/stealing-sensitive-browser-data-with-the-w3c-ambient-light-sensor-api/)
   - Artur Janc: [Cross-origin data leaks via the ambient light sensor](http://arturjanc.com/ls/) 
-  - Artur Janc: [True Colors](http://arturjanc.com/eyedropper/)</em>
+  - Artur Janc: [True Colors](http://arturjanc.com/eyedropper/)
 
   #### Process-Level Attacks
-  - <em>Leaking the contents of compromised renderer memory with [SpectreJS](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/security/side-channel-threat-model.md)</em>
-
-[2] <em>Alex Russell, 2015: [Rethinking :visited-ness](https://docs.google.com/document/d/1Rnq4qZvXiuaO6KSugrXM6M7dVOpRsuOVxZBeobqeN7w/edit)</em>
-[3] <em>Andrew Clover, 2002: [CSS visited pages disclosure](https://seclists.org/bugtraq/2002/Feb/271)</em>
-[4] <em>Jackson et. al., 2006: [Protecting Browser State from Web Privacy Attacks](https://crypto.stanford.edu/sameorigin/sameorigin.pdf)</em>
-[5] <em>Weinberg et al, S&P 2011: [I still know what you visited last summer](https://ieeexplore.ieee.org/abstract/document/5958027)</em>
-[6] <em>Jakob Nielsen, 2004: [Change the Color of Visited Links](https://www.nngroup.com/articles/change-the-color-of-visited-links/)</em>
-
-#### References
-- [CSS 2 Section 5.11.2. The link pseudo-classes: :link and :visited](https://drafts.csswg.org/css2/#link-pseudo-classes)
-- [USENIX WOOT 2018: Browser history re:visited](https://www.usenix.org/sites/default/files/conference/protected-files/woot18_slides_smith.pdf)
-- [Preventing attacks on a user's history through CSS :visited selectors](https://dbaron.org/mozilla/visited-privacy)
-- [Privacy and the :visited selector](https://developer.mozilla.org/en-US/docs/Web/CSS/Privacy_and_the_:visited_selector)
-- [I Still Know What You Visited Last Summer: Leaking Browsing History via User Interaction and Side Channel Attacks.](https://ieeexplore.ieee.org/abstract/document/5958027)
+  - Leaking the contents of compromised renderer memory with [SpectreJS](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/security/side-channel-threat-model.md)
+<br>
+[2] Alex Russell, 2015: [Rethinking :visited-ness](https://docs.google.com/document/d/1Rnq4qZvXiuaO6KSugrXM6M7dVOpRsuOVxZBeobqeN7w/edit)<br>
+[3] Andrew Clover, 2002: [CSS visited pages disclosure](https://seclists.org/bugtraq/2002/Feb/271)
+[4] Jackson et. al., 2006: [Protecting Browser State from Web Privacy Attacks](https://crypto.stanford.edu/sameorigin/sameorigin.pdf)
+[5] Weinberg et al, S&P 2011: [I still know what you visited last summer](https://ieeexplore.ieee.org/abstract/document/5958027)
+[6] Jakob Nielsen, 2004: [Change the Color of Visited Links](https://www.nngroup.com/articles/change-the-color-of-visited-links/)
