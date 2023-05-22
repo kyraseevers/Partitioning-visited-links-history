@@ -48,7 +48,7 @@ Until browsers remove the visible differences between visited and unvisited link
 ## General API Approach:
 To meet our stated goals, we propose partitioning :visited links history. For the purpose of this document, partitioning is defined as storing visited links history via partition key, rather than just by the link URL. When a renderer queries the stored visited links, only queries that match all the elements of the partition key may be colored as visited on the page. On the user’s end, this will mean that the browser styles links as :visited if and only if they have been visited from this site and frame before.
 
-Our partition key will be “triple-keyed” or store three pieces of information: the link’s URL, the top-level site, and the origin of the frame where the link is rendered.
+Our partition key will be `triple-keyed` or store three pieces of information: the `link’s URL`, the `top-level site`, and the `origin of the frame` where the link is rendered.
 
 ![Our example is a site `https://www.foo.com`, which contains an iframe that displays `https://www.bar.com`. The iframe contains an anchor element to `https://link.example` that is styled as visited. The resulting partition key contains a Link URL value of `https://link.example`, a Top-Level Site value of `https://foo.com`, and a Frame Origin value of `https://www.bar.com`.](./img/ExplainerImage1.jpg)
 
@@ -78,9 +78,9 @@ Ultimately, this potential solution did not align with our goal to “improve us
 ### Scenario #1: Partitioning Protects Against User-Interaction, Timing, and Pixel Color Attacks
 
 !["Infographic depicting the process described below: a user going to a search engine, clicking on a link, and then contrasting where links would be styled as visited before and after partitioning."](./img/ExplainerImage2.jpg) <br/>
-<em>A user searches for private.com and clicks on the `https://private.com` link from the `https://search.com/private` results page. Before partitioning, this meant that any site, for example `https://attacker.com`, that embedded `https://private.com` as a link element could see if a user had visited it from the search results before. After partitioning, the links on `https://attacker.com` and `https://search.com/private` have different partition keys, as they have different frame origins and top-level sites. So the partitioned link is not colored - no longer leaking history to `https://attacker.com`.</em>
+<em>A user searches for private.com and clicks on the `https://private.com` link from the `https://search.com/private` results page. Before partitioning, this meant that any site, for example `https://attacker.com`, that embedded `https://private.com` as an anchor element could see if a user had visited it from the search results before. After partitioning, the links on `https://attacker.com` and `https://search.com/private` have different partition keys, as they have different frame origins and top-level sites. So the partitioned link is not styled as :visited - no longer leaking history to `https://attacker.com`.</em>
 
-Attackers employ user-interaction, timing, and pixel color side-channel exploits to gain the user’s browsing history. Currently, a styled :visited link reveals that a user has visited that site anywhere on the web (from a click on a third-party site, from a bookmark, from typing it into the omnibox). This is information that `https://attacker.com` does not already have. However, sites that embed link elements can already determine when a user clicks on a link, and what is embedded in that link. So by partitioning :visited links and limiting coloring to links clicked from this site and frame before, we are not leaking any history that an `https://attacker.com` does not already know.
+Attackers employ user-interaction, timing, and pixel color side-channel exploits to gain the user’s browsing history. Currently, a styled :visited link reveals that a user has visited that site anywhere on the web (from a click on a third-party site, from a bookmark, from typing it into the omnibox). This is information that `https://attacker.com` does not already have. However, sites that embed anchor elements can already determine when a user clicks on a link, and what is embedded in that link. So by partitioning :visited links and limiting coloring to links clicked from this site and frame before, we are not leaking any history that an `https://attacker.com` does not already know.
 
 As a result, partitioning :visited links eliminates its value to attackers, while maintaining the navigational benefits for users. 
 
@@ -164,9 +164,13 @@ Thanks to Artur Janc, Mike Taylor, and Brianna Goldstein for their advice, exper
 
   #### Process-Level Attacks
   - Leaking the contents of compromised renderer memory with [SpectreJS](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/security/side-channel-threat-model.md)
-<br>
-[2] Alex Russell, 2015: [Rethinking :visited-ness](https://docs.google.com/document/d/1Rnq4qZvXiuaO6KSugrXM6M7dVOpRsuOVxZBeobqeN7w/edit)<br>
+
+[2] Alex Russell, 2015: [Rethinking :visited-ness](https://docs.google.com/document/d/1Rnq4qZvXiuaO6KSugrXM6M7dVOpRsuOVxZBeobqeN7w/edit)
+
 [3] Andrew Clover, 2002: [CSS visited pages disclosure](https://seclists.org/bugtraq/2002/Feb/271)
+
 [4] Jackson et. al., 2006: [Protecting Browser State from Web Privacy Attacks](https://crypto.stanford.edu/sameorigin/sameorigin.pdf)
+
 [5] Weinberg et al, S&P 2011: [I still know what you visited last summer](https://ieeexplore.ieee.org/abstract/document/5958027)
+
 [6] Jakob Nielsen, 2004: [Change the Color of Visited Links](https://www.nngroup.com/articles/change-the-color-of-visited-links/)
