@@ -4,7 +4,7 @@
 [Kyra Seevers](https://github.com/kyraseevers)
 
 ## Participate:
-- [Issue Tracker](https://github.com/kyraseevers/Partitioning-visited-links-history/issues)
+[Issue Tracker](https://github.com/kyraseevers/Partitioning-visited-links-history/issues)
 
 ## Table of Contents:
 - [Introduction](#introduction)
