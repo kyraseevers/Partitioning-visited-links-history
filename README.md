@@ -5,7 +5,6 @@
 
 ## Participate:
 - [Issue Tracker](https://github.com/kyraseevers/Partitioning-visited-links-history/issues)
-- [Discussion Forum](TODO)
 
 ## Table of Contents:
 - [Introduction](#introduction)
