@@ -157,6 +157,7 @@ Thanks to Artur Janc, Mike Taylor, and Brianna Goldstein for their advice, exper
   - Known WONTFIX bugs: [crbug.com/252165](http://crbug.com/252165), [crbug.com/835590](http://crbug.com/835590)
 
   #### Pixel Color Attacks
+  - Taneja et al, 2023: [Hot Pixels: Frequency, Power, and Temperature Attacks on GPUs and Arm SoCs](https://doi.org/10.48550/arXiv.2305.12784)
   - Łukasz Olejnik, 2017: [Stealing sensitive browser data with the W3C Ambient Light Sensor API](https://blog.lukaszolejnik.com/stealing-sensitive-browser-data-with-the-w3c-ambient-light-sensor-api/)
   - Artur Janc: [Cross-origin data leaks via the ambient light sensor](http://arturjanc.com/ls/) 
   - Artur Janc: [True Colors](http://arturjanc.com/eyedropper/)
