@@ -97,8 +97,8 @@ frame origins.</em>
 The frame origin in a triple-key partition keeps history confined to the frame it is visited in. Otherwise, any content embedded in a site can determine the history of its embedder; this leak of information would be inconsistent with the same-origin policy which ensures that cross-site iframes don't get access to the state of their embedder, and vice versa.
 
 ## Additional Design Principles
-#### Clicks vs. Other Navigations
-In our proposed design, :visited links history would only contain user browsing history initiated from link clicks. All other navigations (e.g. typing a site into the address bar, navigating to a site from your favorites, etc.) would not be recorded in the :visited links database. All other navigation types cannot be properly attributed to a partition (as they have no top-level site or frame origin). As a result, including these sites in the database, unpartitioned or with a “best-guess” partition, would leak information.
+#### Clicks and Scripted Navigations vs. Other Navigations
+In our proposed design, :visited links history would only contain user browsing history initiated from link clicks and scripted navigations. All other navigations (e.g. typing a site into the address bar, navigating to a site from your favorites, etc.) would not be recorded in the :visited links database. All other navigation types cannot be properly attributed to a partition (as they have no top-level site or frame origin). As a result, including these sites in the database, unpartitioned or with a “best-guess” partition, would leak information.
 
 #### Storing Partitioned Keys Before Launch
 To ensure that the transition between unpartitioned and partitioned :visited links history is as smooth as possible for users, we intend to spend a period of time before launch storing newly visited links as both partitioned and unpartitioned in the database. While this temporarily increases the size of the database, it also ensures that the browser can store complete information about recently visited links before the feature launches.
